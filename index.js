@@ -12,7 +12,7 @@ const axios = require('axios');
 axios.defaults.timeout = 5000;
 
 //高德德图 ak
-const AK = "c404bb67a39b30074cef9296d7f9e551";
+const AK = "";
 //每页大小
 const PAGE_SIZE = 50;
 //并发大小
