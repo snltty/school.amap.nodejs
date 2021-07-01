@@ -19,3 +19,8 @@ npm install
 ```
 node index.js
 ```
+
+### 转化数据为sql
+```
+node parser.js
+```
