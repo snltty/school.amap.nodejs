@@ -2,7 +2,7 @@
  * @Author: snltty
  * @Date: 2021-06-29 22:30:36
  * @LastEditors: snltty
- * @LastEditTime: 2021-06-30 12:49:47
+ * @LastEditTime: 2021-07-01 17:03:48
  * @version: v1.0.0
  * @Descripttion: 功能说明
  * @FilePath: \学校爬虫\index.js
@@ -12,7 +12,7 @@ const axios = require('axios');
 axios.defaults.timeout = 5000;
 
 //高德德图 ak
-const AK = "";
+const AK = "c404bb67a39b30074cef9296d7f9e551";
 //每页大小
 const PAGE_SIZE = 50;
 //并发大小
@@ -35,11 +35,12 @@ const sleep = async (ms) => {
 }
 //写入文件
 const writeResult = async ({ pois = [], page = 1, cityName, typeName }) => {
-    if (!fs.existsSync(`./result/${cityName}/${typeName}`)) {
-        fs.mkdirSync(`./result/${cityName}/${typeName}`, { recursive: true });
+    if (!fs.existsSync(`./result1/${cityName}/${typeName}`)) {
+        fs.mkdirSync(`./result1/${cityName}/${typeName}`, { recursive: true });
     }
-    fs.writeFileSync(`./result/${cityName}/${typeName}/${page}.json`, JSON.stringify(pois.map(c => {
+    fs.writeFileSync(`./result1/${cityName}/${typeName}/${page}.json`, JSON.stringify(pois.map(c => {
         return {
+            id: c.id,
             name: c.name,
             address: c.address,
             location: c.location,
@@ -55,6 +56,8 @@ const writeResult = async ({ pois = [], page = 1, cityName, typeName }) => {
             adcode: c.adcode,
             photos: c.photos,
             timestamp: c.timestamp,
+            type: c.type,
+            typecode: c.typecode,
         }
     })), { 'flag': 'a' });
 }
@@ -109,9 +112,16 @@ const func = async () => {
                         } else if (res.data.infocode == '10010') {
                             console.log('IP访问超限', city, type, res.data);
                             return;
+                        } else if (res.data.infocode.indexOf('3') == 0) {
+                            console.log('3服务错误', city, type, res.data);
+                            fs.writeFileSync(`error.txt`, JSON.stringify({
+                                city, type, data: res.data
+                            }), { 'flag': 'a' });
                         } else {
-                            console.log('服务错误', city, type, res.data);
-                            return;
+                            console.log('其它服务错误', city, type, res.data);
+                            fs.writeFileSync(`error.txt`, JSON.stringify({
+                                city, type, data: res.data
+                            }), { 'flag': 'a' });
                         }
                     } else {
                         onsole.log('网络错误', city, type, res);

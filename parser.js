@@ -2,7 +2,7 @@
  * @Author: snltty
  * @Date: 2021-07-01 09:15:37
  * @LastEditors: snltty
- * @LastEditTime: 2021-07-01 11:50:52
+ * @LastEditTime: 2021-07-01 16:11:27
  * @version: v1.0.0
  * @Descripttion: 功能说明
  * @FilePath: \学校爬虫\parser.js
@@ -10,6 +10,7 @@
 const fs = require('fs')
 
 const result = [];
+const cache = {};
 const fn = (path) => {
 
     const pathStr = path.join('/');
@@ -25,12 +26,16 @@ const fn = (path) => {
             const arr = JSON.parse(str || '[]');
             for (const item of arr) {
                 let { name, address, pname, pcode, cityname, citycode, adname, adcode, location, tel, postcode, website, email, photos, timestamp } = item;
-                tel = typeof tel == 'string' ? tel : tel.join(',');
-                postcode = typeof postcode == 'string' ? postcode : postcode.join(',');
-                website = typeof website == 'string' ? website : website.join(',');
-                email = typeof email == 'string' ? email : email.join(',');
-                photos = typeof photos == 'string' ? photos : photos.map(c => c.url).join(',');
-                result.push(`INSERT INTO SchoolInfo (Name,Address,Pname,Pcode,CityName,CityCode,ADName,ADCode,Location,Tel,PostCode,Website,Email,Photos,Timestamp) VALUES  ('${name}','${address}','${pname}','${pcode}','${cityname}','${citycode}','${adname}','${adcode}','${location}','${tel}','${postcode}','${website}','${email}','${photos}','${timestamp}')`)
+                let key = `${name}-${pname}-${cityname}-${adname}`;
+                if (!cache[key]) {
+                    cache[key] = 1;
+                    tel = typeof tel == 'string' ? tel : tel.join(',');
+                    postcode = typeof postcode == 'string' ? postcode : postcode.join(',');
+                    website = typeof website == 'string' ? website : website.join(',');
+                    email = typeof email == 'string' ? email : email.join(',');
+                    photos = typeof photos == 'string' ? photos : photos.map(c => c.url).join(',');
+                    result.push(`INSERT INTO SchoolInfo (Name,Address,Pname,Pcode,CityName,CityCode,ADName,ADCode,Location,Tel,PostCode,Website,Email,Photos,Timestamp) VALUES  ('${name}','${address}','${pname}','${pcode}','${cityname}','${citycode}','${adname}','${adcode}','${location}','${tel}','${postcode}','${website}','${email}','${photos}','${timestamp}')`)
+                }
             }
         } catch (e) {
             console.log(pathStr);
