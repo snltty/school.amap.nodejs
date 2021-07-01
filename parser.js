@@ -2,7 +2,7 @@
  * @Author: snltty
  * @Date: 2021-07-01 09:15:37
  * @LastEditors: snltty
- * @LastEditTime: 2021-07-01 16:11:27
+ * @LastEditTime: 2021-07-01 17:16:49
  * @version: v1.0.0
  * @Descripttion: 功能说明
  * @FilePath: \学校爬虫\parser.js
@@ -25,10 +25,11 @@ const fn = (path) => {
             let str = fs.readFileSync(pathStr).toString().replace(/\[\]\[/g, '[').replace(/\]\[\]/g, ']').replace(/\]\[/g, ',').replace(/,$/g, '');
             const arr = JSON.parse(str || '[]');
             for (const item of arr) {
-                let { name, address, pname, pcode, cityname, citycode, adname, adcode, location, tel, postcode, website, email, photos, timestamp } = item;
-                let key = `${name}-${pname}-${cityname}-${adname}`;
-                if (!cache[key]) {
-                    cache[key] = 1;
+                let { id, type, typecode, name, address, pname, pcode, cityname, citycode, adname, adcode, location, tel, postcode, website, email, photos, timestamp } = item;
+
+                //没添加过 并且  只有一个分类的 多个分类数据不纯，比如 包含培训机构，校内设施的（某某某楼，某某某学院，某某某教学中心）
+                if (!cache[id] && typecode.indexOf('|') == -1) {
+                    cache[id] = 1;
                     tel = typeof tel == 'string' ? tel : tel.join(',');
                     postcode = typeof postcode == 'string' ? postcode : postcode.join(',');
                     website = typeof website == 'string' ? website : website.join(',');
@@ -68,7 +69,6 @@ CREATE TABLE [dbo].[SchoolInfo](
 	[Email] [varchar](50) NOT NULL default(''),
 	[Photos] [varchar](500) NOT NULL default(''),
 	[Timestamp] [varchar](50) NOT NULL default(''),
-	
 )
 GO 
 `+ result.join('\nGO\n'));
